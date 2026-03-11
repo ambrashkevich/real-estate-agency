@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Вход | Агентство недвижимости</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body class="re-login-shell">
+<div class="re-login-card">
+    <div class="re-logo" style="margin-bottom: 1.1rem;">
+        <div class="re-logo-mark"></div>
+        <span>Nova Estate</span>
+    </div>
+    <div class="re-login-title">Вход в панель</div>
+    <div class="re-login-subtitle">Используйте учётную запись администратора или пользователя</div>
+
+    <div th:if="${param.error}" class="re-alert re-alert-danger">
+        Неверный логин или пароль
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div style="margin-bottom: .8rem;">
+            <div class="re-field-label">Логин</div>
+            <input type="text" name="username" class="re-input" autofocus/>
+        </div>
+        <div style="margin-bottom: 1rem;">
+            <div class="re-field-label">Пароль</div>
+            <input type="password" name="password" class="re-input"/>
+        </div>
+        <button type="submit" class="re-btn-primary">Войти</button>
+    </form>
+
+    <p style="margin-top: 1rem; font-size: .8rem; color: var(--re-muted); text-align: center;">
+        Тестовые учётки: <b>admin / admin</b> или <b>user / user</b>
+    </p>
+</div>
+</body>
+</html>

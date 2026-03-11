@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Агентство недвижимости</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body class="re-shell">
+
+<nav class="re-navbar" sec:authorize="isAuthenticated()">
+    <div class="re-navbar-inner">
+        <a class="re-logo" th:href="@{/}">
+            <div class="re-logo-mark"></div>
+            <span>Nova Estate</span>
+        </a>
+        <div class="re-nav-links">
+            <a class="re-nav-link re-nav-link-active" th:href="@{/}">Главная</a>
+            <a class="re-nav-link" th:href="@{/web/properties}">Объекты</a>
+            <a class="re-nav-link" th:href="@{/web/clients}">Клиенты</a>
+            <a class="re-nav-link" th:href="@{/web/agents}">Агенты</a>
+            <a class="re-nav-link" th:href="@{/web/deals}">Сделки</a>
+        </div>
+        <div class="re-user-chip">
+            <div class="re-user-avatar"></div>
+            <span th:text="${username}">user</span>
+            <form th:action="@{/logout}" method="post" style="margin:0;">
+                <button type="submit" style="border:none;background:none;color:var(--re-muted);font-size:.75rem;cursor:pointer;">
+                    Выйти
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<main class="re-main">
+
+    <!-- Гостевая главная -->
+    <div sec:authorize="!isAuthenticated()" style="text-align:center; margin-top:4rem;">
+        <div class="re-logo" style="justify-content:center; margin-bottom:1.5rem;">
+            <div class="re-logo-mark"></div>
+            <span>Nova Estate</span>
+        </div>
+        <h1 style="font-size:2.1rem; margin-bottom:.3rem;">Агентство недвижимости</h1>
+        <p class="re-page-subtitle" style="max-width:520px;margin:0 auto 1.7rem;">
+            Закрытый раздел для сотрудников агентства. Войдите, чтобы управлять объектами, клиентами и сделками.
+        </p>
+        <a th:href="@{/login}" class="re-btn-primary" style="max-width:220px;display:inline-block;">Войти</a>
+    </div>
+
+    <!-- Главная после логина -->
+    <div sec:authorize="isAuthenticated()">
+        <section class="re-page-heading">
+            <div>
+                <div class="re-page-title">Панель агентства</div>
+                <div class="re-page-subtitle">
+                    Управление объектами, клиентами, агентами и сделками
+                </div>
+            </div>
+        </section>
+
+        <section class="re-kpis">
+            <div class="re-kpi-card">
+                <div class="re-kpi-label">Объекты</div>
+                <div class="re-kpi-value" th:text="${propertiesCount} ?: 0">0</div>
+                <div class="re-kpi-note">активные объявления в базе</div>
+            </div>
+            <div class="re-kpi-card">
+                <div class="re-kpi-label">Агенты</div>
+                <div class="re-kpi-value" th:text="${agentsCount} ?: 0">0</div>
+                <div class="re-kpi-note">работают с клиентами</div>
+            </div>
+            <div class="re-kpi-card">
+                <div class="re-kpi-label">Клиенты</div>
+                <div class="re-kpi-value" th:text="${clientsCount} ?: 0">0</div>
+                <div class="re-kpi-note">в активной работе</div>
+            </div>
+        </section>
+
+        <section class="re-card" sec:authorize="hasRole('ADMIN')">
+            <div class="re-card-header">
+                <div class="re-card-title">Профиль администратора</div>
+                <span class="re-tag">Роль: ADMIN</span>
+            </div>
+            <p class="re-muted" style="margin-bottom:.8rem;">
+                Полный доступ к управлению данными агентства.
+            </p>
+            <ul style="font-size:.9rem; margin:0; padding-left:1.1rem;">
+                <li><a th:href="@{/web/properties}">Полный список объектов</a></li>
+                <li><a th:href="@{/web/agents}">Список агентов</a></li>
+                <li><a th:href="@{/web/clients}">Список клиентов</a></li>
+                <li><a th:href="@{/web/deals}">Все сделки</a></li>
+            </ul>
+        </section>
+
+        <section class="re-card" style="margin-top:1.5rem;" sec:authorize="hasRole('USER')">
+            <div class="re-card-header">
+                <div class="re-card-title">Профиль пользователя</div>
+                <span class="re-tag">Роль: USER</span>
+            </div>
+            <p class="re-muted" style="margin-bottom:.8rem;">
+                Просмотр объектов, клиентов и сделок без административных операций.
+            </p>
+            <ul style="font-size:.9rem; margin:0; padding-left:1.1rem;">
+                <li><a th:href="@{/web/properties}">Каталог объектов</a></li>
+                <li><a th:href="@{/web/agents}">Список агентов</a></li>
+                <li><a th:href="@{/web/clients}">Список клиентов</a></li>
+                <li><a th:href="@{/web/deals}">История сделок</a></li>
+            </ul>
+        </section>
+    </div>
+</main>
+
+<footer class="re-footer">
+    Nova Estate · внутренняя панель агентства недвижимости
+</footer>
+
+</body>
+</html>

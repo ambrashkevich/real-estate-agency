@@ -34,13 +34,20 @@ public class DealService {
     }
 
     public Deal createDeal(Deal deal) {
-        // Update property status
         Property property = deal.getProperty();
-        property.setStatus("SOLD");
+        if ("VIEWING".equals(deal.getDealType())) {
+            property.setStatus("VIEWING_SCHEDULED");
+            deal.setStatus("PENDING");
+        } else {
+            property.setStatus("SOLD");
+            deal.setStatus("COMPLETED");
+        }
         propertyRepository.save(property);
-
-        deal.setStatus("COMPLETED");
         return dealRepository.save(deal);
+    }
+
+    public List<Deal> getDealsByPropertyId(Long propertyId) {
+        return dealRepository.findByProperty_Id(propertyId);
     }
 
     public Deal updateDeal(Long id, Deal dealDetails) {
@@ -56,18 +63,21 @@ public class DealService {
 
     public void cancelDeal(Long id) {
         Deal deal = getDealById(id);
-
-        // Restore property status
         Property property = deal.getProperty();
-        property.setStatus("AVAILABLE");
+        if ("VIEWING".equals(deal.getDealType()) || "PENDING".equals(deal.getStatus())) {
+            property.setStatus("AVAILABLE");
+        }
         propertyRepository.save(property);
-
         deal.setStatus("CANCELLED");
         dealRepository.save(deal);
     }
 
+    public List<Deal> getDealsByClientId(Long clientId) {
+        return dealRepository.findByClient_Id(clientId);
+    }
+
     public List<Deal> getDealsByAgent(Long agentId) {
-        return dealRepository.findByAgentId(agentId);
+        return dealRepository.findByAgent_Id(agentId);
     }
 
     public List<Deal> getDealsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {

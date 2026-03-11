@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Объект | Nova Estate</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body class="re-shell">
+
+<nav class="re-navbar" sec:authorize="isAuthenticated()">
+    <div class="re-navbar-inner">
+        <a class="re-logo" th:href="@{/}">
+            <div class="re-logo-mark"></div>
+            <span>Nova Estate</span>
+        </a>
+        <div class="re-nav-links">
+            <a class="re-nav-link" th:href="@{/}">Главная</a>
+            <a class="re-nav-link re-nav-link-active" th:href="@{/web/properties}">Объекты</a>
+            <a class="re-nav-link" th:href="@{/web/clients}">Клиенты</a>
+            <a class="re-nav-link" th:href="@{/web/agents}">Агенты</a>
+            <a class="re-nav-link" th:href="@{/web/deals}">Сделки</a>
+        </div>
+    </div>
+</nav>
+
+<main class="re-main" sec:authorize="isAuthenticated()">
+    <section class="re-page-heading">
+        <div>
+            <a th:href="@{/web/properties}" class="re-link-back">← К каталогу объектов</a>
+            <div class="re-page-title" th:text="${property.title}">Объект</div>
+            <div class="re-page-subtitle">Детали объекта недвижимости</div>
+        </div>
+        <div class="re-page-actions" sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/web/properties/{id}/edit(id=${property.id})}" class="re-btn-secondary">Редактировать</a>
+            <form th:action="@{/web/properties/{id}/delete(id=${property.id})}" method="post" style="display:inline;"
+                  onsubmit="return confirm('Удалить объект?');">
+                <button type="submit" class="re-btn-danger">Удалить</button>
+            </form>
+        </div>
+    </section>
+
+    <div th:if="${message}" class="re-alert re-alert-success" th:text="${message}"></div>
+    <div th:if="${error}" class="re-alert re-alert-danger" th:text="${error}"></div>
+
+    <section class="re-card">
+        <div class="re-detail-grid">
+            <div class="re-detail-item">
+                <span class="re-detail-label">ID</span>
+                <span th:text="${property.id}">1</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Город</span>
+                <span th:text="${property.city}">Москва</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Район</span>
+                <span th:text="${property.district != null ? property.district : '-'}">-</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Адрес</span>
+                <span th:text="${property.address}">Адрес</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Тип</span>
+                <span class="re-badge-type" th:text="${property.propertyType}">APARTMENT</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Цена</span>
+                <span class="re-price"
+                      th:text="${#numbers.formatDecimal(property.price, 0, 'COMMA', 0, 'POINT')} + ' ₽'">0 ₽</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Площадь</span>
+                <span th:text="${property.area != null ? property.area + ' м²' : '-'}">-</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Спальни / Санузлы</span>
+                <span th:text="|${property.bedrooms != null ? property.bedrooms : '-'} / ${property.bathrooms != null ? property.bathrooms : '-'}|">-</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Статус</span>
+                <span th:class="${'re-status-pill re-status-' + (property.status == 'AVAILABLE' ? 'available' : property.status == 'VIEWING_SCHEDULED' ? 'viewing' : property.status == 'UNDER_CONTRACT' ? 'contract' : property.status == 'SOLD' ? 'sold' : 'rented')}"
+                      th:text="${property.status}">AVAILABLE</span>
+            </div>
+            <div class="re-detail-item re-detail-item-full">
+                <span class="re-detail-label">Описание</span>
+                <span th:text="${property.description != null ? property.description : '-'}">-</span>
+            </div>
+            <div class="re-detail-item re-detail-item-full">
+                <span class="re-detail-label">Агент</span>
+                <a th:if="${property.agent != null}" class="re-link"
+                   th:href="@{/web/agents/{id}(id=${property.agent.id})}"
+                   th:text="${property.agent.firstName + ' ' + property.agent.lastName}">Агент</a>
+                <span th:if="${property.agent == null}" class="re-muted">—</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Запись на просмотр и покупка -->
+    <section class="re-card" th:if="${property.status == 'AVAILABLE' or property.status == 'VIEWING_SCHEDULED'}">
+        <div class="re-card-header">
+            <div class="re-card-title">Действия</div>
+        </div>
+        <div class="re-actions-grid">
+            <div class="re-action-block" th:if="${property.status == 'AVAILABLE'}">
+                <div class="re-action-title">Записаться на просмотр</div>
+                <form th:action="@{/web/properties/{id}/viewing(id=${property.id})}" method="post" class="re-inline-form">
+                    <select name="clientId" class="re-input re-input-sm" required>
+                        <option value="">Выберите клиента</option>
+                        <option th:each="c : ${clients}" th:value="${c.id}"
+                                th:text="${c.firstName + ' ' + c.lastName + ' (' + c.email + ')'}">Клиент</option>
+                    </select>
+                    <select name="agentId" class="re-input re-input-sm" required>
+                        <option value="">Выберите агента</option>
+                        <option th:each="a : ${agents}" th:value="${a.id}"
+                                th:text="${a.firstName + ' ' + a.lastName}">Агент</option>
+                    </select>
+                    <input type="date" name="scheduledDate" class="re-input re-input-sm" required/>
+                    <button type="submit" class="re-btn-primary re-btn-sm">Записать</button>
+                </form>
+            </div>
+            <div class="re-action-block" th:if="${property.status != 'SOLD'}">
+                <div class="re-action-title">Оформить покупку</div>
+                <form th:action="@{/web/properties/{id}/purchase(id=${property.id})}" method="post" class="re-inline-form">
+                    <select name="clientId" class="re-input re-input-sm" required>
+                        <option value="">Выберите клиента</option>
+                        <option th:each="c : ${clients}" th:value="${c.id}"
+                                th:text="${c.firstName + ' ' + c.lastName}">Клиент</option>
+                    </select>
+                    <select name="agentId" class="re-input re-input-sm" required>
+                        <option value="">Выберите агента</option>
+                        <option th:each="a : ${agents}" th:value="${a.id}"
+                                th:text="${a.firstName + ' ' + a.lastName}">Агент</option>
+                    </select>
+                    <input type="number" name="finalPrice" class="re-input re-input-sm" th:placeholder="${'Цена (₽), напр. ' + #numbers.formatInteger(property.price, 0, 'COMMA')}"
+                           min="0" step="100000" required/>
+                    <input type="text" name="notes" class="re-input re-input-sm" placeholder="Примечания"/>
+                    <button type="submit" class="re-btn-primary re-btn-sm">Купить</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Сделки по объекту -->
+    <section class="re-card" th:if="${!#lists.isEmpty(deals)}">
+        <div class="re-card-header">
+            <div class="re-card-title">Сделки по объекту</div>
+            <span class="re-tag" th:text="|${#lists.size(deals)}|">0</span>
+        </div>
+        <div class="re-table-wrapper">
+            <table class="re-table">
+                <thead>
+                <tr>
+                    <th>Тип</th>
+                    <th>Клиент</th>
+                    <th>Агент</th>
+                    <th>Цена</th>
+                    <th>Статус</th>
+                    <th>Дата</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${deals}">
+                    <td><span class="re-badge-type" th:text="${d.dealType}">SALE</span></td>
+                    <td>
+                        <a class="re-link" th:href="@{/web/clients/{id}(id=${d.client.id})}"
+                           th:text="${d.client.firstName + ' ' + d.client.lastName}">Клиент</a>
+                    </td>
+                    <td>
+                        <a class="re-link" th:href="@{/web/agents/{id}(id=${d.agent.id})}"
+                           th:text="${d.agent.firstName + ' ' + d.agent.lastName}">Агент</a>
+                    </td>
+                    <td class="re-price">
+                        <span th:if="${d.dealType == 'VIEWING'}">—</span>
+                        <span th:if="${d.dealType != 'VIEWING'}"
+                              th:text="${#numbers.formatDecimal(d.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽'">0 ₽</span>
+                    </td>
+                    <td>
+                        <span th:class="${'re-status-pill ' + (d.status == 'COMPLETED' ? 're-status-available' : d.status == 'PENDING' ? 're-status-viewing' : 're-status-sold')}"
+                              th:text="${d.status}">PENDING</span>
+                    </td>
+                    <td th:text="${#temporals.format(d.dealDate, 'dd.MM.yyyy HH:mm')}">01.01.2024</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer class="re-footer" sec:authorize="isAuthenticated()">
+    Nova Estate · внутренняя панель агентства недвижимости
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Агенты | Nova Estate</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body class="re-shell">
+
+<nav class="re-navbar" sec:authorize="isAuthenticated()">
+    <div class="re-navbar-inner">
+        <a class="re-logo" th:href="@{/}">
+            <div class="re-logo-mark"></div>
+            <span>Nova Estate</span>
+        </a>
+        <div class="re-nav-links">
+            <a class="re-nav-link" th:href="@{/}">Главная</a>
+            <a class="re-nav-link" th:href="@{/web/properties}">Объекты</a>
+            <a class="re-nav-link" th:href="@{/web/clients}">Клиенты</a>
+            <a class="re-nav-link re-nav-link-active" th:href="@{/web/agents}">Агенты</a>
+            <a class="re-nav-link" th:href="@{/web/deals}">Сделки</a>
+        </div>
+    </div>
+</nav>
+
+<main class="re-main" sec:authorize="isAuthenticated()">
+    <section class="re-page-heading">
+        <div>
+            <div class="re-page-title">Агенты</div>
+            <div class="re-page-subtitle">
+                Сотрудники агентства и их контакты
+            </div>
+        </div>
+    </section>
+
+    <section class="re-card">
+        <div class="re-card-header">
+            <div class="re-card-title">Список агентов</div>
+            <span class="re-tag" th:text="|Всего: ${#lists.size(agents)}|">Всего: 0</span>
+        </div>
+        <div class="re-table-wrapper">
+            <table class="re-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Email</th>
+                    <th>Телефон</th>
+                    <th>Лицензия</th>
+                    <th>Комиссия</th>
+                    <th>Дата создания</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${agents}">
+                    <td th:text="${a.id}">1</td>
+                    <td>
+                        <a class="re-link" th:href="@{/web/agents/{id}(id=${a.id})}"
+                           th:text="${a.firstName + ' ' + a.lastName}">Имя Фамилия</a>
+                    </td>
+                    <td th:text="${a.email}">email</td>
+                    <td th:text="${a.phone}">phone</td>
+                    <td th:text="${a.licenseNumber}">LIC-001</td>
+                    <td th:text="${a.commission} + ' %'">0 %</td>
+                    <td th:text="${#temporals.format(a.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2024</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(agents)}">
+                    <td colspan="7" class="re-muted">Нет агентов для отображения</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer class="re-footer" sec:authorize="isAuthenticated()">
+    Nova Estate · внутренняя панель агентства недвижимости
+</footer>
+
+</body>
+</html>
+

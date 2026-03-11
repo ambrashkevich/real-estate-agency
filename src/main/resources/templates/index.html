@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Дашборд | Nova Estate</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body class="re-shell">
+
+<nav class="re-navbar" sec:authorize="isAuthenticated()">
+    <div class="re-navbar-inner">
+        <a class="re-logo" th:href="@{/}">
+            <div class="re-logo-mark"></div>
+            <span>Nova Estate</span>
+        </a>
+        <div class="re-nav-links">
+            <a class="re-nav-link" th:href="@{/}">Главная</a>
+            <a class="re-nav-link re-nav-link-active" th:href="@{/web/properties}">Объекты</a>
+            <a class="re-nav-link" th:href="@{/web/clients}">Клиенты</a>
+            <a class="re-nav-link" th:href="@{/web/agents}">Агенты</a>
+            <a class="re-nav-link" th:href="@{/web/deals}">Сделки</a>
+        </div>
+    </div>
+</nav>
+
+<main class="re-main" sec:authorize="isAuthenticated()">
+    <section class="re-page-heading">
+        <div>
+            <div class="re-page-title">Обзор объектов</div>
+            <div class="re-page-subtitle">
+                Быстрый список актуальных объектов и работающих агентов
+            </div>
+        </div>
+    </section>
+
+    <section class="re-card" style="margin-bottom:1.5rem;">
+        <div class="re-card-header">
+            <div class="re-card-title">Актуальные объекты</div>
+            <span class="re-tag" th:text="|Всего: ${#lists.size(properties)}|">Всего: 0</span>
+        </div>
+        <div class="re-table-wrapper">
+            <table class="re-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Город</th>
+                    <th>Тип</th>
+                    <th>Цена</th>
+                    <th>Статус</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${properties}">
+                    <td th:text="${p.id}">1</td>
+                    <td>
+                        <a class="re-link" th:href="@{/web/properties/{id}(id=${p.id})}" th:text="${p.title}">Квартира</a>
+                    </td>
+                    <td th:text="${p.city}">Москва</td>
+                    <td>
+                        <span class="re-badge-type" th:text="${p.propertyType}">APARTMENT</span>
+                    </td>
+                    <td class="re-price"
+                        th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' ₽'">
+                        0 ₽
+                    </td>
+                    <td>
+                        <span th:class="${'re-status-pill ' + (p.status == 'AVAILABLE' ? 're-status-available' : p.status == 'VIEWING_SCHEDULED' ? 're-status-viewing' : p.status == 'UNDER_CONTRACT' ? 're-status-contract' : p.status == 'SOLD' ? 're-status-sold' : 're-status-rented')}"
+                              th:text="${p.status}">AVAILABLE</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(properties)}">
+                    <td colspan="6" class="re-muted">Нет объектов для отображения</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="re-card">
+        <div class="re-card-header">
+            <div class="re-card-title">Агенты</div>
+            <span class="re-tag" th:text="|Всего: ${#lists.size(agents)}|">Всего: 0</span>
+        </div>
+        <div class="re-table-wrapper">
+            <table class="re-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Email</th>
+                    <th>Телефон</th>
+                    <th>Комиссия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${agents}">
+                    <td th:text="${a.id}">1</td>
+                    <td>
+                        <a class="re-link" th:href="@{/web/agents/{id}(id=${a.id})}"
+                           th:text="${a.firstName + ' ' + a.lastName}">Имя Фамилия</a>
+                    </td>
+                    <td th:text="${a.email}">email</td>
+                    <td th:text="${a.phone}">phone</td>
+                    <td th:text="${a.commission} + ' %'">0 %</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(agents)}">
+                    <td colspan="5" class="re-muted">Нет агентов для отображения</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer class="re-footer" sec:authorize="isAuthenticated()">
+    Nova Estate · внутренняя панель агентства недвижимости
+</footer>
+
+</body>
+</html>
+

@@ -18,7 +18,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     List<Property> findByPropertyType(String propertyType);
 
-    List<Property> findByAgentId(Long agentId);
+    List<Property> findByAgent_Id(Long agentId);
 
     @Query("SELECT p FROM Property p WHERE p.price BETWEEN :minPrice AND :maxPrice")
     List<Property> findByPriceRange(@Param("minPrice") BigDecimal minPrice,

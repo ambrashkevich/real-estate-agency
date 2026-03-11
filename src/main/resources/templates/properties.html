@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Объекты | Nova Estate</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body class="re-shell">
+
+<nav class="re-navbar" sec:authorize="isAuthenticated()">
+    <div class="re-navbar-inner">
+        <a class="re-logo" th:href="@{/}">
+            <div class="re-logo-mark"></div>
+            <span>Nova Estate</span>
+        </a>
+        <div class="re-nav-links">
+            <a class="re-nav-link" th:href="@{/}">Главная</a>
+            <a class="re-nav-link re-nav-link-active" th:href="@{/web/properties}">Объекты</a>
+            <a class="re-nav-link" th:href="@{/web/clients}">Клиенты</a>
+            <a class="re-nav-link" th:href="@{/web/agents}">Агенты</a>
+            <a class="re-nav-link" th:href="@{/web/deals}">Сделки</a>
+        </div>
+    </div>
+</nav>
+
+<main class="re-main" sec:authorize="isAuthenticated()">
+    <section class="re-page-heading">
+        <div>
+            <div class="re-page-title">Каталог объектов</div>
+            <div class="re-page-subtitle">
+                Все объекты недвижимости в базе агентства
+            </div>
+        </div>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/web/properties/new}" class="re-btn-primary">
+            + Добавить объект
+        </a>
+    </section>
+
+    <section class="re-card">
+        <div class="re-card-header">
+            <div class="re-card-title">Объекты</div>
+            <span class="re-tag" th:text="|Всего: ${#lists.size(properties)}|">Всего: 0</span>
+        </div>
+        <div class="re-table-wrapper">
+            <table class="re-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Город</th>
+                    <th>Адрес</th>
+                    <th>Тип</th>
+                    <th>Площадь</th>
+                    <th>Спальни</th>
+                    <th>Цена</th>
+                    <th>Статус</th>
+                    <th>Агент</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${properties}">
+                    <td th:text="${p.id}">1</td>
+                    <td>
+                        <a class="re-link" th:href="@{/web/properties/{id}(id=${p.id})}" th:text="${p.title}">Квартира</a>
+                    </td>
+                    <td th:text="${p.city}">Москва</td>
+                    <td th:text="${p.address}">Адрес</td>
+                    <td><span class="re-badge-type" th:text="${p.propertyType}">APARTMENT</span></td>
+                    <td th:text="${p.area} + ' м²'">0 м²</td>
+                    <td th:text="${p.bedrooms}">0</td>
+                    <td class="re-price"
+                        th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' ₽'">
+                        0 ₽
+                    </td>
+                    <td>
+                        <span th:class="${'re-status-pill ' + (p.status == 'AVAILABLE' ? 're-status-available' : p.status == 'VIEWING_SCHEDULED' ? 're-status-viewing' : p.status == 'UNDER_CONTRACT' ? 're-status-contract' : p.status == 'SOLD' ? 're-status-sold' : 're-status-rented')}"
+                              th:text="${p.status}">AVAILABLE</span>
+                    </td>
+                    <td>
+                        <a th:if="${p.agent != null}" class="re-link"
+                           th:href="@{/web/agents/{id}(id=${p.agent.id})}"
+                           th:text="${p.agent.firstName + ' ' + p.agent.lastName}">Агент</a>
+                        <span th:if="${p.agent == null}" class="re-muted">—</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(properties)}">
+                    <td colspan="10" class="re-muted">Нет объектов для отображения</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer class="re-footer" sec:authorize="isAuthenticated()">
+    Nova Estate · внутренняя панель агентства недвижимости
+</footer>
+
+</body>
+</html>
+

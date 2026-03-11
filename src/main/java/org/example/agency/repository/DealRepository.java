@@ -12,11 +12,13 @@ import java.util.List;
 @Repository
 public interface DealRepository extends JpaRepository<Deal, Long> {
 
-    List<Deal> findByAgentId(Long agentId);
+    List<Deal> findByAgent_Id(Long agentId);
 
-    List<Deal> findByClientId(Long clientId);
+    List<Deal> findByClient_Id(Long clientId);
 
-    List<Deal> findByPropertyId(Long propertyId);
+    List<Deal> findByProperty_Id(Long propertyId);
+
+    List<Deal> findByDealType(String dealType);
 
     List<Deal> findByStatus(String status);
 

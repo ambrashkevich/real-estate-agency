@@ -1,6 +1,8 @@
 package org.example.agency.service;
 
+import org.example.agency.model.Agent;
 import org.example.agency.model.Property;
+import org.example.agency.repository.AgentRepository;
 import org.example.agency.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +17,15 @@ public class PropertyService {
     @Autowired
     private PropertyRepository propertyRepository;
 
+    @Autowired
+    private AgentRepository agentRepository;
+
     public List<Property> getAllProperties() {
         return propertyRepository.findAll();
+    }
+
+    public List<Property> getPropertiesByAgentId(Long agentId) {
+        return propertyRepository.findByAgent_Id(agentId);
     }
 
     public Property getPropertyById(Long id) {
@@ -30,8 +39,11 @@ public class PropertyService {
     }
 
     public Property updateProperty(Long id, Property propertyDetails) {
-        Property property = getPropertyById(id);
+        return updateProperty(id, propertyDetails, propertyDetails.getAgent() != null ? propertyDetails.getAgent().getId() : null);
+    }
 
+    public Property updateProperty(Long id, Property propertyDetails, Long agentId) {
+        Property property = getPropertyById(id);
         property.setTitle(propertyDetails.getTitle());
         property.setAddress(propertyDetails.getAddress());
         property.setCity(propertyDetails.getCity());
@@ -43,7 +55,9 @@ public class PropertyService {
         property.setBathrooms(propertyDetails.getBathrooms());
         property.setDescription(propertyDetails.getDescription());
         property.setStatus(propertyDetails.getStatus());
-
+        if (agentId != null) {
+            property.setAgent(agentRepository.findById(agentId).orElse(null));
+        }
         return propertyRepository.save(property);
     }
 

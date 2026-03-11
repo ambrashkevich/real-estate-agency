@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Сделка | Nova Estate</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+<body class="re-shell">
+
+<nav class="re-navbar" sec:authorize="isAuthenticated()">
+    <div class="re-navbar-inner">
+        <a class="re-logo" th:href="@{/}">
+            <div class="re-logo-mark"></div>
+            <span>Nova Estate</span>
+        </a>
+        <div class="re-nav-links">
+            <a class="re-nav-link" th:href="@{/}">Главная</a>
+            <a class="re-nav-link" th:href="@{/web/properties}">Объекты</a>
+            <a class="re-nav-link" th:href="@{/web/clients}">Клиенты</a>
+            <a class="re-nav-link" th:href="@{/web/agents}">Агенты</a>
+            <a class="re-nav-link re-nav-link-active" th:href="@{/web/deals}">Сделки</a>
+        </div>
+    </div>
+</nav>
+
+<main class="re-main" sec:authorize="isAuthenticated()">
+    <section class="re-page-heading">
+        <div>
+            <a th:href="@{/web/deals}" class="re-link-back">← К списку сделок</a>
+            <div class="re-page-title">Сделка #<span th:text="${deal.id}">1</span></div>
+            <div class="re-page-subtitle">
+                <span class="re-badge-type" th:text="${deal.dealType}">SALE</span>
+                <span th:class="${'re-status-pill ' + (deal.status == 'COMPLETED' ? 're-status-available' : deal.status == 'PENDING' ? 're-status-viewing' : 're-status-sold')}"
+                      th:text="${deal.status}" style="margin-left: .5rem;">PENDING</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="re-card">
+        <div class="re-detail-grid">
+            <div class="re-detail-item re-detail-item-full">
+                <span class="re-detail-label">Объект</span>
+                <a class="re-link" th:href="@{/web/properties/{id}(id=${deal.property.id})}"
+                   th:text="${deal.property.title}">Объект</a>
+            </div>
+            <div class="re-detail-item re-detail-item-full">
+                <span class="re-detail-label">Клиент</span>
+                <a class="re-link" th:href="@{/web/clients/{id}(id=${deal.client.id})}"
+                   th:text="${deal.client.firstName + ' ' + deal.client.lastName + ' (' + deal.client.email + ')'}">Клиент</a>
+            </div>
+            <div class="re-detail-item re-detail-item-full">
+                <span class="re-detail-label">Агент</span>
+                <a class="re-link" th:href="@{/web/agents/{id}(id=${deal.agent.id})}"
+                   th:text="${deal.agent.firstName + ' ' + deal.agent.lastName}">Агент</a>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Цена</span>
+                <span class="re-price" th:if="${deal.dealType != 'VIEWING'}"
+                      th:text="${#numbers.formatDecimal(deal.finalPrice, 0, 'COMMA', 0, 'POINT')} + ' ₽'">0 ₽</span>
+                <span th:if="${deal.dealType == 'VIEWING'}" class="re-muted">—</span>
+            </div>
+            <div class="re-detail-item">
+                <span class="re-detail-label">Дата сделки</span>
+                <span th:text="${#temporals.format(deal.dealDate, 'dd.MM.yyyy HH:mm')}">01.01.2024</span>
+            </div>
+            <div class="re-detail-item re-detail-item-full" th:if="${deal.notes != null}">
+                <span class="re-detail-label">Примечания</span>
+                <span th:text="${deal.notes}">—</span>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="re-footer" sec:authorize="isAuthenticated()">
+    Nova Estate · внутренняя панель агентства недвижимости
+</footer>
+
+</body>
+</html>
