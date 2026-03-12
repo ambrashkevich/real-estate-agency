@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Журнал действий</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .action-tag { padding: 4px 8px; border-radius: 4px; font-size: 0.9em; font-weight: bold; }
+        .CREATE { background: #d4edda; color: #155724; }
+        .UPDATE { background: #fff3cd; color: #856404; }
+        .DELETE { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Журнализация событий (Audit Log)</h1>
+        <div class="nav">
+            <a th:href="@{/admin/dashboard}">Назад в панель</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Дата/Время</th>
+                    <th>Пользователь</th>
+                    <th>Сущность</th>
+                    <th>ID</th>
+                    <th>Действие</th>
+                    <th>Детали</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="log : ${logs}">
+                    <td th:text="${#temporals.format(log.createdAt, 'dd.MM.yyyy HH:mm:ss')}"></td>
+                    <td th:text="${log.username}"></td>
+                    <td th:text="${log.entityName}"></td>
+                    <td th:text="${log.entityId}"></td>
+                    <td>
+                        <span th:class="'action-tag ' + ${log.action}" th:text="${log.action}"></span>
+                    </td>
+                    <td th:text="${log.details}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

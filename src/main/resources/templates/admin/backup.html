@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Резервное копирование</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .container { padding: 20px; max-width: 800px; margin: 0 auto; }
+        .action-card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #f9f9f9; }
+        .btn { padding: 10px 20px; border-radius: 4px; cursor: pointer; border: none; font-weight: bold; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .error { color: #dc3545; padding: 10px; background: #f8d7da; border-radius: 4px; margin-bottom: 20px; }
+        .message { color: #28a745; padding: 10px; background: #d4edda; border-radius: 4px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Управление базой данных</h1>
+        <div class="nav">
+            <a th:href="@{/admin/dashboard}">Назад в панель</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+        <div th:if="${message}" class="message" th:text="${message}"></div>
+
+        <div class="action-card">
+            <h3>Создать резервную копию</h3>
+            <p>Будет создан SQL-файл с текущим состоянием базы данных в папке <code>backups/</code>.</p>
+            <form th:action="@{/admin/backup/create}" method="post">
+                <button type="submit" class="btn btn-primary">Запустить pg_dump</button>
+            </form>
+        </div>
+
+        <div class="action-card">
+            <h3>Восстановить из файла</h3>
+            <p>Введите имя файла из папки <code>backups/</code> (например, <code>backup_20260312_120000.sql</code>).</p>
+            <form th:action="@{/admin/backup/restore}" method="post">
+                <input type="text" name="fileName" placeholder="backup_xxx.sql" style="padding: 8px; width: 300px; margin-bottom: 10px;">
+                <br>
+                <button type="submit" class="btn btn-secondary">Запустить pg_restore</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

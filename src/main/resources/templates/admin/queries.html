@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SQL Запросы</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .sql-container { padding: 20px; max-width: 1000px; margin: 0 auto; }
+        textarea { width: 100%; height: 150px; padding: 10px; font-family: monospace; border: 1px solid #ddd; border-radius: 4px; }
+        .btn-execute { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        .results-container { margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 10px; border: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .error { color: #dc3545; padding: 10px; background: #f8d7da; border-radius: 4px; margin-top: 10px; }
+        .message { color: #28a745; padding: 10px; background: #d4edda; border-radius: 4px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Произвольные SQL Запросы (Режим администратора)</h1>
+        <div class="nav">
+            <a th:href="@{/admin/dashboard}">Назад в панель</a>
+        </div>
+    </div>
+
+    <div class="sql-container">
+        <form th:action="@{/admin/execute-query}" method="post">
+            <label for="sql">Введите SQL-запрос (SELECT для выборки или DML для изменений):</label>
+            <textarea name="sql" id="sql" th:text="${sql}" placeholder="SELECT * FROM properties;"></textarea>
+            <button type="submit" class="btn-execute">Выполнить</button>
+        </form>
+
+        <div th:if="${error}" class="error">
+            <strong>Ошибка:</strong> <span th:text="${error}"></span>
+        </div>
+
+        <div th:if="${message}" class="message">
+            <span th:text="${message}"></span>
+        </div>
+
+        <div th:if="${results}" class="results-container">
+            <h3>Результаты запроса:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th th:each="col : ${columns}" th:text="${col}"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="row : ${results}">
+                        <td th:each="col : ${columns}" th:text="${row[col]}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

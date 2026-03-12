@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Панель администратора</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+        .card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: white; }
+        h3 { margin-top: 0; color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Панель администратора - Аналитика</h1>
+        <div class="nav">
+            <a th:href="@{/}">Главная</a>
+            <a th:href="@{/admin/queries}">SQL Запросы</a>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="card">
+            <h3>Средняя цена по районам</h3>
+            <table>
+                <tr><th>Район</th><th>Средняя цена (₽)</th></tr>
+                <tr th:each="row : ${avgPricePerDistrict}">
+                    <td th:text="${row.name}"></td>
+                    <td th:text="${#numbers.formatDecimal(row.avg_price, 0, 'COMMA', 2, 'POINT')}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Продажи по агентам</h3>
+            <table>
+                <tr><th>Агент</th><th>Сумма продаж (₽)</th></tr>
+                <tr th:each="row : ${salesByAgent}">
+                    <td th:text="${row.first_name + ' ' + row.last_name}"></td>
+                    <td th:text="${#numbers.formatDecimal(row.total_sales, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Популярные типы недвижимости</h3>
+            <table>
+                <tr><th>Тип</th><th>Количество</th></tr>
+                <tr th:each="row : ${popularTypes}">
+                    <td th:text="${row.name}"></td>
+                    <td th:text="${row.count}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Постоянные клиенты (>1 сделки)</h3>
+            <table>
+                <tr><th>Клиент</th><th>Кол-во сделок</th></tr>
+                <tr th:each="row : ${repeatClients}">
+                    <td th:text="${row.first_name + ' ' + row.last_name}"></td>
+                    <td th:text="${row.deal_count}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Выручка по месяцам</h3>
+            <table>
+                <tr><th>Месяц</th><th>Выручка (₽)</th></tr>
+                <tr th:each="row : ${revenueByMonth}">
+                    <td th:text="${row.month}"></td>
+                    <td th:text="${#numbers.formatDecimal(row.revenue, 0, 'COMMA', 0, 'POINT')}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Топ-5 объектов по кол-ву удобств</h3>
+            <table>
+                <tr><th>Объект</th><th>Кол-во удобств</th></tr>
+                <tr th:each="row : ${propertiesByFeatures}">
+                    <td th:text="${row.title}"></td>
+                    <td th:text="${row.feature_count}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Последние 10 просмотров</h3>
+            <table>
+                <tr><th>Дата</th><th>Объект</th><th>Агент</th></tr>
+                <tr th:each="row : ${latestViewings}">
+                    <td th:text="${#temporals.format(row.viewing_date, 'dd.MM.yyyy HH:mm')}"></td>
+                    <td th:text="${row.property}"></td>
+                    <td th:text="${row.agent}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Общая статистика</h3>
+            <p>Средняя скидка при сделках: <strong th:text="${#numbers.formatDecimal(avgDiscount[0].avg_discount, 0, 2) + '%'}"></strong></p>
+            <p>Объектов без просмотров: <strong th:text="${propertiesNoViewings.size()}"></strong></p>
+        </div>
+    </div>
+</body>
+</html>
