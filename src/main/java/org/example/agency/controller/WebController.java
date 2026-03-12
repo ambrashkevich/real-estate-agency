@@ -1,13 +1,13 @@
 package org.example.agency.controller;
 
-import org.example.agency.model.Agent;
-import org.example.agency.model.Client;
-import org.example.agency.model.Deal;
-import org.example.agency.model.Property;
+import org.example.agency.model.*;
+import org.example.agency.repository.DistrictRepository;
+import org.example.agency.repository.PropertyTypeRepository;
 import org.example.agency.service.AgentService;
 import org.example.agency.service.ClientService;
 import org.example.agency.service.DealService;
 import org.example.agency.service.PropertyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +26,12 @@ public class WebController {
     private final ClientService clientService;
     private final PropertyService propertyService;
     private final DealService dealService;
+    
+    @Autowired
+    private DistrictRepository districtRepository;
+    
+    @Autowired
+    private PropertyTypeRepository propertyTypeRepository;
 
     public WebController(AgentService agentService, ClientService clientService,
                          PropertyService propertyService, DealService dealService) {
@@ -104,17 +110,19 @@ public class WebController {
     public String propertyFormNew(Model model) {
         model.addAttribute("property", new Property());
         model.addAttribute("agents", agentService.getAllAgents());
+        model.addAttribute("districts", districtRepository.findAll());
+        model.addAttribute("propertyTypes", propertyTypeRepository.findAll());
         return "property-form";
     }
 
     @PostMapping("/properties")
     @PreAuthorize("hasRole('ADMIN')")
-    public String propertyCreate(@ModelAttribute Property property, @RequestParam(required = false) Long agentId,
+    public String propertyCreate(@ModelAttribute Property property, 
+                                 @RequestParam(name = "agentId", required = false) Long agentId,
+                                 @RequestParam(name = "districtId", required = false) Long districtId,
+                                 @RequestParam(name = "propertyTypeId", required = false) Long propertyTypeId,
                                  RedirectAttributes ra) {
-        if (agentId != null) {
-            property.setAgent(agentService.getAgentById(agentId));
-        }
-        propertyService.createProperty(property);
+        propertyService.createProperty(property, agentId, districtId, propertyTypeId);
         ra.addFlashAttribute("message", "Объект успешно добавлен");
         return "redirect:/web/properties";
     }
@@ -124,14 +132,19 @@ public class WebController {
     public String propertyFormEdit(@PathVariable Long id, Model model) {
         model.addAttribute("property", propertyService.getPropertyById(id));
         model.addAttribute("agents", agentService.getAllAgents());
+        model.addAttribute("districts", districtRepository.findAll());
+        model.addAttribute("propertyTypes", propertyTypeRepository.findAll());
         return "property-form";
     }
 
     @PostMapping("/properties/{id}/edit")
     @PreAuthorize("hasRole('ADMIN')")
     public String propertyUpdate(@PathVariable Long id, @ModelAttribute Property property,
-                                 @RequestParam(required = false) Long agentId, RedirectAttributes ra) {
-        propertyService.updateProperty(id, property, agentId);
+                                 @RequestParam(name = "agentId", required = false) Long agentId,
+                                 @RequestParam(name = "districtId", required = false) Long districtId,
+                                 @RequestParam(name = "propertyTypeId", required = false) Long propertyTypeId,
+                                 RedirectAttributes ra) {
+        propertyService.updateProperty(id, property, agentId, districtId, propertyTypeId);
         ra.addFlashAttribute("message", "Объект обновлён");
         return "redirect:/web/properties/" + id;
     }

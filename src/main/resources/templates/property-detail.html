@@ -55,7 +55,7 @@
             </div>
             <div class="re-detail-item">
                 <span class="re-detail-label">Район</span>
-                <span th:text="${property.district != null ? property.district : '-'}">-</span>
+                <span th:text="${property.district != null ? property.district.name : '-'}">-</span>
             </div>
             <div class="re-detail-item">
                 <span class="re-detail-label">Адрес</span>
@@ -63,7 +63,7 @@
             </div>
             <div class="re-detail-item">
                 <span class="re-detail-label">Тип</span>
-                <span class="re-badge-type" th:text="${property.propertyType}">APARTMENT</span>
+                <span class="re-badge-type" th:text="${property.propertyType != null ? property.propertyType.name : '-'}">APARTMENT</span>
             </div>
             <div class="re-detail-item">
                 <span class="re-detail-label">Цена</span>

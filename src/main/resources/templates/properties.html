@@ -49,6 +49,7 @@
                     <th>ID</th>
                     <th>Название</th>
                     <th>Город</th>
+                    <th>Район</th>
                     <th>Адрес</th>
                     <th>Тип</th>
                     <th>Площадь</th>
@@ -65,8 +66,9 @@
                         <a class="re-link" th:href="@{/web/properties/{id}(id=${p.id})}" th:text="${p.title}">Квартира</a>
                     </td>
                     <td th:text="${p.city}">Москва</td>
+                    <td th:text="${p.district != null ? p.district.name : '—'}">Район</td>
                     <td th:text="${p.address}">Адрес</td>
-                    <td><span class="re-badge-type" th:text="${p.propertyType}">APARTMENT</span></td>
+                    <td><span class="re-badge-type" th:text="${p.propertyType != null ? p.propertyType.name : '—'}">APARTMENT</span></td>
                     <td th:text="${p.area} + ' м²'">0 м²</td>
                     <td th:text="${p.bedrooms}">0</td>
                     <td class="re-price"
@@ -85,7 +87,7 @@
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(properties)}">
-                    <td colspan="10" class="re-muted">Нет объектов для отображения</td>
+                    <td colspan="11" class="re-muted">Нет объектов для отображения</td>
                 </tr>
                 </tbody>
             </table>

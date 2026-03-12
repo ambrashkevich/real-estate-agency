@@ -28,13 +28,20 @@ public class PropertyController {
     }
 
     @PostMapping
-    public ResponseEntity<Property> createProperty(@RequestBody Property property) {
-        return new ResponseEntity<>(propertyService.createProperty(property), HttpStatus.CREATED);
+    public ResponseEntity<Property> createProperty(@RequestBody Property property, 
+                                                   @RequestParam(required = false) Long agentId,
+                                                   @RequestParam(required = false) Long districtId,
+                                                   @RequestParam(required = false) Long propertyTypeId) {
+        return new ResponseEntity<>(propertyService.createProperty(property, agentId, districtId, propertyTypeId), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Property> updateProperty(@PathVariable Long id, @RequestBody Property property) {
-        return ResponseEntity.ok(propertyService.updateProperty(id, property));
+    public ResponseEntity<Property> updateProperty(@PathVariable Long id, 
+                                                   @RequestBody Property property,
+                                                   @RequestParam(required = false) Long agentId,
+                                                   @RequestParam(required = false) Long districtId,
+                                                   @RequestParam(required = false) Long propertyTypeId) {
+        return ResponseEntity.ok(propertyService.updateProperty(id, property, agentId, districtId, propertyTypeId));
     }
 
     @DeleteMapping("/{id}")

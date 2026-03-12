@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8"/>
-    <title th:text="${property.id != null ? 'Редактирование объекта' : 'Новый объект'} | Nova Estate</title>
+    <title th:text="${property.id != null ? 'Редактирование объекта' : 'Новый объект'} + ' | Nova Estate'"></title>
     <link th:href="@{/css/style.css}" rel="stylesheet"/>
 </head>
 <body class="re-shell">
@@ -50,7 +50,12 @@
                 </div>
                 <div class="re-form-group">
                     <label class="re-field-label">Район</label>
-                    <input type="text" class="re-input" th:field="*{district}"/>
+                    <select class="re-input" name="districtId">
+                        <option value="">— не выбран —</option>
+                        <option th:each="d : ${districts}" th:value="${d.id}"
+                                th:text="${d.name}"
+                                th:selected="${property.district != null && property.district.id == d.id}">Район</option>
+                    </select>
                 </div>
                 <div class="re-form-group re-form-group-full">
                     <label class="re-field-label">Адрес *</label>
@@ -58,11 +63,11 @@
                 </div>
                 <div class="re-form-group">
                     <label class="re-field-label">Тип *</label>
-                    <select class="re-input" th:field="*{propertyType}" required>
-                        <option value="APARTMENT">Квартира</option>
-                        <option value="HOUSE">Дом</option>
-                        <option value="COMMERCIAL">Коммерческая</option>
-                        <option value="LAND">Участок</option>
+                    <select class="re-input" name="propertyTypeId" required>
+                        <option value="">— выберите тип —</option>
+                        <option th:each="t : ${propertyTypes}" th:value="${t.id}"
+                                th:text="${t.name}"
+                                th:selected="${property.propertyType != null && property.propertyType.id == t.id}">Тип</option>
                     </select>
                 </div>
                 <div class="re-form-group">

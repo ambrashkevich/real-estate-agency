@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "properties")
@@ -29,10 +31,13 @@ public class Property {
     @Column(nullable = false)
     private String city;
 
-    private String district;
+    @ManyToOne
+    @JoinColumn(name = "district_id")
+    private District district;
 
-    @Column(nullable = false)
-    private String propertyType; // APARTMENT, HOUSE, COMMERCIAL, LAND
+    @ManyToOne
+    @JoinColumn(name = "property_type_id")
+    private PropertyType propertyType;
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -51,6 +56,14 @@ public class Property {
     @ManyToOne
     @JoinColumn(name = "agent_id")
     private Agent agent;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "property_features",
+            joinColumns = @JoinColumn(name = "property_id"),
+            inverseJoinColumns = @JoinColumn(name = "feature_id")
+    )
+    private Set<Feature> features = new HashSet<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
